@@ -1,3 +1,4 @@
+import { callbackify } from 'util';
 import { EventEmitter } from './EventEmitter';
 
 /*
@@ -6,11 +7,21 @@ import { EventEmitter } from './EventEmitter';
 2)В методе unsubscribe отпишитесь от события click с помощью EventEmitter.off(eventName, callback).
 В качестве callback нужно передавать тот же самый обработчик, который был передан при подписке.
  */
+
 export const obj = {
     count: 0,
-    subscribe() {},
-    unsubscribe() {},
-};
+    callback: () => {
+        obj.count += 1;
+    },
+
+    subscribe() {
+        EventEmitter.on('click', this.callback)
+    },
+    unsubscribe() {
+        EventEmitter.off('click', this.callback)
+    },
+
+}
 
 /*
 Сделайте так, чтобы метод first вызывал метод second со своими аргументами, но в обратном порядке:
@@ -19,7 +30,12 @@ obj1.first(1, 2, 3);
 // Внутренний вызов должен быть равносилен obj1.second(3, 2, 1)
  */
 export const obj1 = {
-    first(...args) {},
+    first(...args) {
+        let arg = [...args];
+        arg.reverse();
+        arg.join(',');
+        this.second(...arg);
+    },
     second() {
         // здесь ничего писать не нужно
     },
